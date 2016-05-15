@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Window</class>
+ <widget class="QMainWindow" name="Window">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>403</width>
+    <height>524</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Window</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="MyGLWidget" name="myGLWidget" native="true"/>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QSlider" name="xRotSilder">
+        <property name="maximum">
+         <number>360</number>
+        </property>
+        <property name="singleStep">
+         <number>15</number>
+        </property>
+        <property name="pageStep">
+         <number>16</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::TicksAbove</enum>
+        </property>
+        <property name="tickInterval">
+         <number>15</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="yRotSilder">
+        <property name="maximum">
+         <number>360</number>
+        </property>
+        <property name="singleStep">
+         <number>16</number>
+        </property>
+        <property name="pageStep">
+         <number>15</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::TicksAbove</enum>
+        </property>
+        <property name="tickInterval">
+         <number>15</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="zRotSilder">
+        <property name="maximum">
+         <number>360</number>
+        </property>
+        <property name="singleStep">
+         <number>16</number>
+        </property>
+        <property name="pageStep">
+         <number>15</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::TicksAbove</enum>
+        </property>
+        <property name="tickInterval">
+         <number>15</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>403</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MyGLWidget</class>
+   <extends>QWidget</extends>
+   <header>myglwidget.h</header>
+   <container>1</container>
+   <slots>
+    <slot>setXRotation(int)</slot>
+    <slot>setYRotation(int)</slot>
+    <slot>setZRotation(int)</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>xRotSilder</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>myGLWidget</receiver>
+   <slot>setXRotation(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>86</x>
+     <y>313</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>77</x>
+     <y>226</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>yRotSilder</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>myGLWidget</receiver>
+   <slot>setYRotation(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>136</x>
+     <y>383</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>125</x>
+     <y>246</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>zRotSilder</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>myGLWidget</receiver>
+   <slot>setZRotation(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>226</x>
+     <y>444</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>221</x>
+     <y>235</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
