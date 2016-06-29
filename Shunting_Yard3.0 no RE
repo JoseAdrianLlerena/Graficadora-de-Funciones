@@ -2,7 +2,9 @@
 #include <QVector>
 #include <QDebug>
 #include <QHash>
+#include <QRegularExpression>
 
+///Funtion: Tokenize
 QVector<QString> Tokenize (QString expression)
 {
     QVector<QString> TokenList;
@@ -44,8 +46,13 @@ QVector<QString> Tokenize (QString expression)
         else
             i++;
     }
-    //return TokenList;
-    ///Shunting_Yard
+    return TokenList;
+}
+///Funtion: Shunting_Yard
+QVector<QString> Shunting_Yard (QString expression)
+{
+    QVector<QString> TokenList;
+    TokenList = Tokenize(expression);
     QVector<QString> OutPut;
     QVector<QString> Stack;
     QVector<QString> Error;
@@ -58,7 +65,6 @@ QVector<QString> Tokenize (QString expression)
     precedence["^"] = 4;
     precedence["%"] = 4;
     precedence["r"] = 4;
-
     QHash<QString,QChar> associative;
     associative["+"] = 'i';
     associative["-"] = 'i';
@@ -67,6 +73,7 @@ QVector<QString> Tokenize (QString expression)
     associative["%"] = 'i';
     associative["^"] = 'd';
     associative["r"] = 'd';
+    int i;
     i = 0;
     ///Mientras hayan tokens a ser leidos
     while(i<TokenList.length())
@@ -89,12 +96,10 @@ QVector<QString> Tokenize (QString expression)
         {
             ///Mientras no se encuentre parentesis abierto, retire de la Stack los operadores
             //Hacer notar error si no se encuentra parentesis "("
-            while(Stack[0][0]!='(')
+            while(Stack[0][0]!='(' )
             {
                 OutPut.append(Stack[0]);
                 Stack.pop_front();
-                if(Stack[0].isNull())
-                    return Error;
             }
             i++;
         }
@@ -161,9 +166,12 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     ///3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3
-    QVector<QString> test = Tokenize("sin ( max  ( 2, 3 ) / 3 * 3.1415 )");
+    QVector<QString> test = Shunting_Yard("sin ( max ( 2, 3 ) / 3 * 3.1415 )");
     QVector<QString>::iterator it;
     for (it=test.begin(); it<test.end(); it++)
         qDebug() << *it;
+    QRegularExpression re("comprobando algo");
+    re.setPattern("comprobando algox2");
+
     return a.exec();
 }
