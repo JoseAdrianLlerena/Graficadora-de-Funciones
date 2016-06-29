@@ -1,10 +1,14 @@
 #include <QCoreApplication>
 #include <QVector>
 #include <QDebug>
+#include <QRegExp>
+#include <math.h>
 
-QVector<QString> Tokenize (QString expression)
+typedef QVector<QString> tokenlist;
+
+tokenlist Tokenize (QString expression)
 {
-    QVector<QString> TokenList;
+    tokenlist TokenList;
     int i = 0;
     while(i < expression.length())
     {
@@ -30,6 +34,8 @@ QVector<QString> Tokenize (QString expression)
                 temp.append(expression[i+1]);
                 i++;
             }
+            if (temp == "e")
+                temp = "2.71828182";
             TokenList.append(temp);
             i++;
         }
@@ -48,6 +54,96 @@ QVector<QString> Tokenize (QString expression)
 
 typedef double calc;
 
+calc Addition (tokenlist tokens)
+{
+    calc result = 0;
+    for (int i=0; i<tokens.length(); i++)
+    {
+        result += tokens[i].toDouble();
+    }
+    return result;
+}
+
+calc Substraction (tokenlist tokens)
+{
+    calc result = tokens.first().toDouble();
+    for (int i=1; i<tokens.length(); i++)
+    {
+        result -= tokens[i].toDouble();
+    }
+    return result;
+}
+
+calc Multiplication (tokenlist tokens)
+{
+    calc result = 1;
+    for (int i=0; i<tokens.length(); i++)
+    {
+        result *= tokens[i].toDouble();
+    }
+    return result;
+}
+
+calc Division (tokenlist tokens)
+{
+    calc result = tokens.first().toDouble();
+    for (int i=1; i<tokens.length(); i++)
+    {
+        result /= tokens[i].toDouble();
+    }
+    return result;
+}
+
+calc Exponentiation (tokenlist tokens)
+{
+    return pow(tokens.first().toDouble(), tokens.last().toDouble());
+}
+
+calc Sine (tokenlist tokens)
+{
+    return sin(tokens.first().toDouble());
+}
+
+calc Cosine (tokenlist tokens)
+{
+    return cos(tokens.first().toDouble());
+}
+
+calc Tangent (tokenlist tokens)
+{
+    return tan(tokens.first().toDouble());
+}
+
+calc Cotangent (tokenlist tokens)
+{
+    return 1/tan(tokens.first().toDouble());
+}
+
+calc Secant (tokenlist tokens)
+{
+    return 1/cos(tokens.first().toDouble());
+}
+
+calc Cosecant (tokenlist tokens)
+{
+    return 1/sin(tokens.first().toDouble());
+}
+
+calc Log10 (tokenlist tokens)
+{
+    return log10(tokens.first().toDouble());
+}
+
+calc LogE (tokenlist tokens)
+{
+    return log(tokens.first().toDouble());
+}
+
+calc Log2 (tokenlist tokens)
+{
+    return log2(tokens.first().toDouble());
+}
+
 QMap<QString, int> argnumberOperator = {
     {"+", 2},
     {"-", 2},
@@ -59,52 +155,67 @@ QMap<QString, int> argnumberOperator = {
     {"tan", 1},
     {"ctg", 1},
     {"sec", 1},
-    {"csc", 1}
+    {"csc", 1},
+    {"log", 1},
+    {"ln", 1},
+    {"lg", 1}
 };
 
-QMap<QString, calc> Operation = {
-    {"sin", },
-    {"cos", },
-    {"tan", },
-    {"ctg", },
-    {"sec", },
-    {"csc", },
-    {"+", },
-    {"-", },
-    {"*", },
-    {"/", },
-    {"^", }
+typedef calc (*operate)(tokenlist);
+
+QMap<QString, operate> Operation = {
+    {"+", Addition},
+    {"-", Substraction},
+    {"*", Multiplication},
+    {"/", Division},
+    {"^", Exponentiation},
+    {"sin", Sine},
+    {"cos", Cosine},
+    {"tan", Tangent},
+    {"ctg", Cotangent},
+    {"sec", Secant},
+    {"csc", Cosecant},
+    {"log", Log10},
+    {"ln", LogE},
+    {"lg", Log2}
 };
 
-calc PostfixCalculate (QVector<QString> PostfixTokens)
+calc PostfixCalculate (tokenlist PostfixTokens)
 {
-    QVector<QString> tempStack;
-    while (!PostfixTokens.empty())
+    tokenlist tempStack;
+    std::for_each (PostfixTokens.begin(), PostfixTokens.end(), [&PostfixTokens, &tempStack](QString Token)
     {
-        std::for_each (PostfixTokens.begin(), PostfixTokens.end(), [](QString Token)
+        QRegExp numToken("\\d+\\.?\\d*");
+        if (numToken.exactMatch(Token))
+            tempStack.push_front(Token);
+        else if (tempStack.length() >= argnumberOperator[Token])
         {
-            QRegExp numToken("\\d*");
-            if (numToken.exactMatch(Token))
-                tempStack.push_front(Token);
-            else if (PostfixTokens.length()>=argnumberOperator[Token])
+            tokenlist operands;
+            for (int i=0; i<argnumberOperator[Token]; i++)
             {
-                //Sacar los n valores de TempStack
-                //Evaluar la operacion
-                //Push el resultado
+                operands.push_front(tempStack.first());
+                tempStack.pop_front();
             }
-        })
-    }
-    //Si solo hay un valor en la pila, ese es el resultado
-    //Si hay mas de un valor, el usuario ha ingresado muchos valores
+            calc tempValue = (*(Operation[Token]))(operands);
+            tempStack.push_front(QString::number(tempValue));
+        }
+        //else:  Error: El usuario ha ingresado insuficientes valores
+    });
+    if (tempStack.length() == 1)
+        return tempStack.first().toDouble();
+    else
+        return 0; //El usuario ha ingresado muchos valores. Agregar error.
 }
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QVector<QString> test = Tokenize("sin (3.15 +15*5/10    ) /10  ^ 5");
+    tokenlist test = Tokenize ("5 1 2 + 4 * + 3 - ln"); // ln (5 + ((1 + 2) * 4) − 3)
     QVector<QString>::iterator it;
     for (it=test.begin(); it<test.end(); it++)
         qDebug() << *it;
+    calc result = PostfixCalculate(test);
+    qDebug() << result;
     return a.exec();
 }
